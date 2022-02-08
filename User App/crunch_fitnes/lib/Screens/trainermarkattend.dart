@@ -47,7 +47,7 @@ class _MarkTAttendanceState extends State<MarkTAttendance> {
         .get();
 
     if (doc.exists) {
-      attendancemarking('/AppData/Attendance/TrainerAttendance//', '');
+      attendancemarking('/AppData/Attendance/TrainerAttendance/', '');
     } else {
       users.doc(month).set({"name": month});
       attendancemarking('/AppData/Attendance/TrainerAttendance/', '');
@@ -78,7 +78,8 @@ class _MarkTAttendanceState extends State<MarkTAttendance> {
         newusers.doc(uid).set({
           "name": GetStorage().read('name'),
           "status": true,
-          "timein": Timestamp.fromDate(DateTime.now())
+          "timein": Timestamp.fromDate(DateTime.now()),
+          "timeout": ""
         }, SetOptions(merge: true)).then((value) {
           setState(() {
             inatt = true;

@@ -99,7 +99,9 @@ class _PaymentState extends State<Payment> {
         'name': widget.name,
         'startdate': Timestamp.fromDate(DateTime.now()),
         'enddate': Timestamp.fromDate(
-            DateTime.now().add(Duration(days: (widget.duration * 30).round())))
+            DateTime.now().add(Duration(days: (widget.duration * 30).round()))),
+        'ishold': false,
+        'holddate': imestamp.fromDate(DateTime.now())
       });
     } else {
       CollectionReference _collectionRef1 =
@@ -110,7 +112,9 @@ class _PaymentState extends State<Payment> {
         'name': widget.name,
         'startdate': Timestamp.fromDate(DateTime.now()),
         'enddate': Timestamp.fromDate(
-            DateTime.now().add(Duration(days: (widget.duration * 30).round())))
+            DateTime.now().add(Duration(days: (widget.duration * 30).round()))),
+        'ishold': false,
+        'holddate': imestamp.fromDate(DateTime.now())
       });
     }
   }

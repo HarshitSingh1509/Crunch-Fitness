@@ -49,6 +49,11 @@ class _MarkAttendanceState extends State<MarkAttendance> {
           attendancemarking(
               '/AppData/Attendance/OtherActivities/${dat["id"]}/attendance/',
               ' for ${dat['id']}');
+        } else {
+          users.doc(month).set({"name": month});
+          attendancemarking(
+              '/AppData/Attendance/OtherActivities/${dat["id"]}/attendance/',
+              ' for ${dat['id']}');
         }
       } else {
         users.doc(dat['id']).set({"name": dat['id']});

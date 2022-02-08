@@ -116,14 +116,13 @@ class _TrainerAttendanceState extends State<TrainerAttendance> {
       floatingActionButton: IconButton(
         icon: Icon(Icons.camera),
         onPressed: () async {
-          print(jsonEncode({"id": "somerandom", "isother": false}));
           String codeSanner = await BarcodeScanner.scan(); //barcode scanner
           var data;
           setState(() {
             qrCodeResult = codeSanner;
             data = jsonDecode(qrCodeResult);
           });
-          Navigator.pop(
+          Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => MarkTAttendance(data: data)));

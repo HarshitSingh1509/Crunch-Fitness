@@ -1,7 +1,15 @@
+import 'package:crunch_fitness/Constants/colors.dart';
+import 'package:crunch_fitness/Screens/home.dart';
+import 'package:crunch_fitness/Screens/home_screen.dart';
+import 'package:crunch_fitness/Screens/members.dart';
+import 'package:crunch_fitness/Screens/trainer.dart';
+import 'package:crunch_fitness/Widgets/buttonwidget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:sizer/sizer.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,22 +36,27 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
+    return Sizer(builder: (context, orientation, deviceType) {
+      return MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          // This is the theme of your application.
+          //
+          // Try running your application with "flutter run". You'll see the
+          // application has a blue toolbar. Then, without quitting the app, try
+          // changing the primarySwatch below to Colors.green and then invoke
+          // "hot reload" (press "r" in the console where you ran "flutter run",
+          // or simply save your changes to "hot reload" in a Flutter IDE).
+          // Notice that the counter didn't reset back to zero; the application
+          // is not restarted.
+          primarySwatch: Colors.blue,
+        ),
+        home: // HomeScreen()
+            const MyHomePage(
+          title: "Crunch Fitness",
+        ),
+      );
+    });
   }
 }
 
@@ -66,21 +79,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  // Future<void> signin(String email, String password) async {
+  //   try {
+  //     await FirebaseAuth.instance
+  //         .signInWithEmailAndPassword(email: email, password: password)
+  //         .then((value) {
+  //       Navigator.push(
+  //         context,
+  //         MaterialPageRoute<void>(
+  //           builder: (BuildContext context) => HomeScreen(),
+  //         ),
+  //       );
+  //     });
+  //   } on FirebaseAuthException catch (e) {
+  //     if (e.code == 'user-not-found') {
+  //       print('No user found for that email.');
+  //     } else if (e.code == 'wrong-password') {
+  //       print('Wrong password provided for that user.');
+  //     }
+  //   }
+  // }
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
+  TextEditingController name = TextEditingController();
+  TextEditingController password = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
+
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -88,46 +113,91 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+          // Center is a layout widget. It takes a single child and positions it
+          // in the middle of the parent.
+          child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Image(
+            image: AssetImage("assets/Layer 1@2x.png"),
+            height: screenSize.width * 0.15,
+            width: screenSize.width * 0.15,
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Welcome Admin!",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 30 * screenSize.shortestSide * 0.002)),
+              SizedBox(
+                height: 15,
+              ),
+              Text("Lets see what's going on in your app",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: lightred)),
+              SizedBox(
+                height: 15,
+              ),
+              SizedBox(
+                width: screenSize.width * 0.25,
+                height: screenSize.height * 0.1,
+                child: Padding(
+                    padding: EdgeInsets.only(top: 10, bottom: 10),
+                    child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: new BorderRadius.circular(10.0),
+                        ),
+                        child: Padding(
+                            padding:
+                                EdgeInsets.only(left: 15, right: 15, top: 5),
+                            child: TextFormField(
+                                controller: name,
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  labelText: 'UserName',
+                                ))))),
+              ),
+              SizedBox(
+                width: screenSize.width * 0.25,
+                height: screenSize.height * 0.1,
+                child: Padding(
+                    padding: EdgeInsets.only(top: 10, bottom: 10),
+                    child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: new BorderRadius.circular(10.0),
+                        ),
+                        child: Padding(
+                            padding:
+                                EdgeInsets.only(left: 15, right: 15, top: 5),
+                            child: TextFormField(
+                                controller: password,
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  labelText: 'Password',
+                                ))))),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              ButtonMethodWidget(() {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                        builder: (BuildContext context) => HomeScreen()));
+                //signin(name.text, password.text);
+              }, screenSize.height * 0.08, screenSize.width * 0.25, "Login",
+                  15 * (screenSize.shortestSide * 0.002))
+            ],
+          )
+        ],
+      )),
+      // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
