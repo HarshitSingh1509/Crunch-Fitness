@@ -50,13 +50,13 @@ class _PaymentState extends State<Payment> {
     String desc,
   ) async {
     var options = {
-      'key': 'rzp_test_99Wm7wpKaliMOm',
-      'amount': amt * 100,
-      'name': 'Acme Corp.',
+      'key': 'rzp_live_u9UgR4EMZQKuWF',
+      'amount': (amt * 100).toString(),
+      'name': 'Crunch the fitness studio',
       'description': desc,
       'retry': {'enabled': true, 'max_count': 1},
       'send_sms_hash': true,
-      'prefill': {'contact': '8888888888', 'email': 'test@razorpay.com'},
+      // 'prefill': {'contact': '8888888888', 'email': 'test@razorpay.com'},
       'external': {
         'wallets': ['paytm']
       }
@@ -101,7 +101,7 @@ class _PaymentState extends State<Payment> {
         'enddate': Timestamp.fromDate(
             DateTime.now().add(Duration(days: (widget.duration * 30).round()))),
         'ishold': false,
-        'holddate': imestamp.fromDate(DateTime.now())
+        'holddate': Timestamp.fromDate(DateTime.now())
       });
     } else {
       CollectionReference _collectionRef1 =
@@ -114,7 +114,7 @@ class _PaymentState extends State<Payment> {
         'enddate': Timestamp.fromDate(
             DateTime.now().add(Duration(days: (widget.duration * 30).round()))),
         'ishold': false,
-        'holddate': imestamp.fromDate(DateTime.now())
+        'holddate': Timestamp.fromDate(DateTime.now())
       });
     }
   }

@@ -31,6 +31,9 @@ class _RegisterState extends State<Register> {
   TextEditingController phnumber = TextEditingController();
   TextEditingController name = TextEditingController();
   TextEditingController email = TextEditingController();
+  TextEditingController refid = TextEditingController();
+  TextEditingController adress = TextEditingController();
+  String otp = "";
   StreamController<ErrorAnimationType>? errorController;
   @override
   void initState() {
@@ -65,7 +68,8 @@ class _RegisterState extends State<Register> {
 
 // String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
 //     length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
-  Future<void> addUser(String name, String email, String number) {
+  Future<void> addUser(String name, String email, String number, String adress,
+      String refferid) {
     // Call the user's CollectionReference to add a new user
     FirebaseAuth auth = FirebaseAuth.instance;
     String uid = auth.currentUser!.uid;
@@ -77,7 +81,9 @@ class _RegisterState extends State<Register> {
       'invite': generateRandomString(15),
       'joindate': Timestamp.fromDate(DateTime.now()),
       'isactive': true,
-      'aadharurl': img
+      'aadharurl': img,
+      'address': adress,
+      'refferedby': refferid
     }).then((value) {
       CollectionReference _collectionRef1 =
           FirebaseFirestore.instance.collection('/Users/$uid/Notification');
@@ -223,6 +229,7 @@ class _RegisterState extends State<Register> {
                                 labelText: 'Email',
                               ))))),
             ),
+
             SizedBox(
               width: 350,
               height: 75,
@@ -329,12 +336,16 @@ class _RegisterState extends State<Register> {
                       )
                     ],
                     onCompleted: (v) async {
+                      setState(() {
+                        otp = v;
+                      });
                       bool isverified = await loginwithotp(v);
 
                       print(isverified);
                       if (isverified) {
                         if (widget.n == 1) {
-                          await addUser(name.text, email.text, phnumber.text);
+                          await addUser(name.text, email.text, phnumber.text,
+                              adress.text, refid.text);
                           Navigator.pushReplacement(
                               context,
                               MaterialPageRoute<void>(
@@ -416,9 +427,48 @@ class _RegisterState extends State<Register> {
             //               ))))),
             // ),
             SizedBox(
+              width: 350,
+              height: 75,
+              child: Padding(
+                  padding: EdgeInsets.only(top: 10, bottom: 10),
+                  child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: new BorderRadius.circular(10.0),
+                      ),
+                      child: Padding(
+                          padding: EdgeInsets.only(left: 15, right: 15, top: 5),
+                          child: TextFormField(
+                              controller: adress,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                labelText: 'Address',
+                              ))))),
+            ),
+            SizedBox(
+              width: 350,
+              height: 75,
+              child: Padding(
+                  padding: EdgeInsets.only(top: 10, bottom: 10),
+                  child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: new BorderRadius.circular(10.0),
+                      ),
+                      child: Padding(
+                          padding: EdgeInsets.only(left: 15, right: 15, top: 5),
+                          child: TextFormField(
+                              controller: refid,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                labelText: 'Refferal code',
+                              ))))),
+            ),
+            SizedBox(
               height: 30,
             ),
             ButtonMethodWidget(funct1, 50.0, 350.0, 'Continue', 20.0),
+
             SizedBox(
               height: 15,
             ),
@@ -440,7 +490,9 @@ class _RegisterState extends State<Register> {
                       await addUser(
                           user.user!.displayName ?? name.text,
                           user.user!.email ?? email.text,
-                          user.user!.phoneNumber ?? phnumber.text);
+                          user.user!.phoneNumber ?? phnumber.text,
+                          adress.text,
+                          refid.text);
                       Navigator.pushReplacement(
                           context,
                           MaterialPageRoute<void>(
@@ -485,7 +537,9 @@ class _RegisterState extends State<Register> {
                           user.user!.displayName ?? name.text,
                           user.additionalUserInfo!.profile!["email"] ??
                               email.text,
-                          user.user!.phoneNumber ?? phnumber.text);
+                          user.user!.phoneNumber ?? phnumber.text,
+                          adress.text,
+                          refid.text);
                       Navigator.pushReplacement(
                           context,
                           MaterialPageRoute<void>(
@@ -555,5 +609,25 @@ class _RegisterState extends State<Register> {
     );
   }
 
-  funct1() {}
+  funct1() async {
+    bool isverified = await loginwithotp(otp);
+    print(isverified);
+    if (isverified) {
+      if (widget.n == 1) {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute<void>(
+              builder: (BuildContext context) => HomePage(
+                index: 0,
+              ),
+            ));
+      } else {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute<void>(
+              builder: (BuildContext context) => const TrainerAttendance(),
+            ));
+      }
+    }
+  }
 }

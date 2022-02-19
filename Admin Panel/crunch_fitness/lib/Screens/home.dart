@@ -29,9 +29,10 @@ class _HomeState extends State<Home> {
   void initState() {
     // TODO: implement initState
     totalsubs(6);
-
+    absentchart();
+    subscriptionchart();
     absenttodayfunc();
-    totaljoined();
+    totaljoined(6);
     super.initState();
   }
 
@@ -49,14 +50,104 @@ class _HomeState extends State<Home> {
         // print((element["startdate"] ?? Timestamp(0, 0))
         //     .compareTo(Timestamp(n * 30 * 24 * 60 * 60 * 100, 0)));
         if ((element["startdate"] ?? Timestamp(0, 0))
-                .compareTo(Timestamp(6 * 30 * 24 * 60 * 60 * 100, 0)) >
+                .compareTo(Timestamp(n * 30 * 24 * 60 * 60 * 1000, 0)) <
             0) {
+          print("its here");
           sum = sum + element["price"];
           setState(() {
             totalsubscription = sum;
           });
         }
       });
+    });
+  }
+
+  Future<void> subscriptionchart() async {
+    double sum = 0;
+    CollectionReference _collectionRef =
+        FirebaseFirestore.instance.collection('/Users');
+    QuerySnapshot querySnapshot = await _collectionRef.get();
+    querySnapshot.docs.forEach((element1) async {
+      QuerySnapshot _collectionRefdoc = await FirebaseFirestore.instance
+          .collection('/Users/${element1.id}/Subscription')
+          .get();
+      _collectionRefdoc.docs.forEach((element) {
+        for (int p = 0; p < 5; p++) {
+          sum = 0;
+          if (((element["startdate"] ?? Timestamp(0, 0)).compareTo(
+                      Timestamp((p + 1) * 30 * 24 * 60 * 60 * 1000, 0)) <
+                  0) &&
+              ((element["startdate"] ?? Timestamp(0, 0))
+                      .compareTo(Timestamp((p) * 30 * 24 * 60 * 60 * 1000, 0)) >
+                  0)) {
+            sum = sum + element["price"];
+          }
+          setState(() {
+            subscriptionchartdata[p] = (SalesData(
+                (DateTime.now().month - p) < 1
+                    ? (DateTime.now().month - p + 12)
+                    : (DateTime.now().month - p),
+                subscriptionchartdata[p].sales! + sum));
+          });
+          print(sum);
+        }
+      });
+    });
+  }
+
+  List<SalesData> absentchartdata = [
+    SalesData(1, 0),
+    SalesData(1, 0),
+    SalesData(1, 0),
+    SalesData(1, 0),
+    SalesData(1, 0)
+  ];
+  List<SalesData> presentchartdata = [
+    SalesData(1, 0),
+    SalesData(1, 0),
+    SalesData(1, 0),
+    SalesData(1, 0),
+    SalesData(1, 0)
+  ];
+  Future<void> absentchart() async {
+    double sum = 0;
+    CollectionReference _collectionRef =
+        FirebaseFirestore.instance.collection('/Users');
+    //   '/AppData/Attendance/UserAttendance/${months[today.month]},${today.year}/${today.day}');
+    QuerySnapshot querySnapshot = await _collectionRef.get();
+    querySnapshot.docs.forEach((element1) async {
+      for (int i = 0; i < 5; i++) {
+        if (today.day - i > 0) {
+          DocumentSnapshot qu = await FirebaseFirestore.instance
+              .doc(
+                  '/AppData/Attendance/UserAttendance/${months[today.month - 1]},${today.year}/${today.day - i}/${element1.id}')
+              .get();
+
+          if (qu.exists != true) {
+            setState(() {
+              absentchartdata[i] = SalesData(
+                  (DateTime.now().day - i) <= 0
+                      ? DateTime.now().day
+                      : DateTime.now().day - i,
+                  (DateTime.now().day - i) <= 0
+                      ? 0
+                      : absentchartdata[i].sales! + 1);
+            });
+          } else if (qu["status"] == true) {
+            setState(() {
+              presentchartdata[i] = SalesData(
+                  (DateTime.now().day - i) <= 0
+                      ? DateTime.now().day
+                      : DateTime.now().day - i,
+                  (DateTime.now().day - i) <= 0
+                      ? 0
+                      : presentchartdata[i].sales! + 1);
+            });
+          }
+        }
+        ;
+        print(presentchartdata);
+      }
     });
   }
 
@@ -73,7 +164,7 @@ class _HomeState extends State<Home> {
     }
   }
 
-  Future<void> totaljoined() async {
+  Future<void> totaljoined(int n) async {
     totaljoinedintimespan = 0;
     todaynewjoin = 0;
     double sum = 0;
@@ -87,35 +178,51 @@ class _HomeState extends State<Home> {
       //     .get();
 
       if ((element1["joindate"] ?? Timestamp(0, 0))
-              .compareTo(Timestamp(6 * 30 * 24 * 60 * 60 * 1000, 0)) <
+              .compareTo(Timestamp(n * 30 * 24 * 60 * 60 * 1000, 0)) <
           0) {
-        print(element1["refferedby"]);
-        print(element1["name"]);
+        // print(element1["refferedby"]);
+        // print(element1["name"]);
         if (element1['refferedby'] != "") {
           String tempname = await search(element1["refferedby"]);
           if (tempname != "") {
+            if (((element1["joindate"] as Timestamp).toDate())
+                    .difference(DateTime.now())
+                    .inDays >=
+                0) {
+              setState(() {
+                todaynewthroughrefferal = todaynewthroughrefferal + 1;
+              });
+            }
             setState(() {
               refferaljoinerlist.add([
-                "Delhi",
+                element1["address"],
                 element1["name"],
                 tempname,
                 element1["refferedby"]
               ]);
             });
-            print(refferaljoinerlist);
+            //      print(refferaljoinerlist);
           }
         }
 
         setState(() {
-          joinerlist.add(["Delhi", element1["name"]]);
+          joinerlist.add([element1["address"], element1["name"]]);
         });
 
         setState(() {
           totaljoinedintimespan = totaljoinedintimespan + 1;
         });
       }
-      if ((element1["joindate"] ?? Timestamp(0, 0))
-              .compareTo(Timestamp(24 * 60 * 60 * 1000, 0)) <
+      print(((element1["joindate"] as Timestamp).toDate())
+              .difference(DateTime.now())
+              .inDays >=
+          0);
+      // print((DateTime(element1["joindate"].toDate()).difference(DateTime.now()))
+      //     .toString());
+      print(element1["name"]);
+      if (((element1["joindate"] as Timestamp).toDate())
+              .difference(DateTime.now())
+              .inDays >=
           0) {
         setState(() {
           todaynewjoin = todaynewjoin + 1;
@@ -123,6 +230,14 @@ class _HomeState extends State<Home> {
       }
     });
   }
+
+  List<SalesData> subscriptionchartdata = [
+    SalesData(1, 0),
+    SalesData(1, 0),
+    SalesData(1, 0),
+    SalesData(1, 0),
+    SalesData(1, 0)
+  ];
 
   Future<void> absenttodayfunc() async {
     totalabsent = 0;
@@ -133,8 +248,11 @@ class _HomeState extends State<Home> {
     //   '/AppData/Attendance/UserAttendance/${months[today.month]},${today.year}/${today.day}');
     QuerySnapshot querySnapshot = await _collectionRef.get();
     querySnapshot.docs.forEach((element1) async {
+      print(
+          "/AppData/Attendance/UserAttendance/${months[today.month - 1]},${today.year}/${today.day}/${element1.id}");
       DocumentSnapshot qu = await FirebaseFirestore.instance
-          .doc('/AppData/Attendance/UserAttendance/Feb,2022/1/${element1.id}')
+          .doc(
+              '/AppData/Attendance/UserAttendance/${months[today.month - 1]},${today.year}/${today.day}/${element1.id}')
           .get();
 
       if (qu.exists != true) {
@@ -234,15 +352,23 @@ class _HomeState extends State<Home> {
                             setState(() {
                               ddval = value!;
                               if (value == "Last 1 month") {
+                                totaljoined(1);
+                                totalsubs(1);
                                 ddintval = 0;
                               }
                               if (value == "Last 3 month") {
+                                totaljoined(3);
+                                totalsubs(3);
                                 ddintval = 1;
                               }
                               if (value == "Last 6 month") {
+                                totaljoined(6);
+                                totalsubs(6);
                                 ddintval = 2;
                               }
                               if (value == "Last 1 Yr") {
+                                totaljoined(12);
+                                totalsubs(12);
                                 ddintval = 3;
                               }
                             });
@@ -265,7 +391,7 @@ class _HomeState extends State<Home> {
                   child: Container(
                     color: Colors.white,
                     width: screenSize.width * 0.2,
-                    height: screenSize.height * 0.13,
+                    height: screenSize.height * 0.15,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -289,43 +415,36 @@ class _HomeState extends State<Home> {
                                           screenSize.shortestSide *
                                           0.0012),
                                 ),
-                                Row(
-                                  children: [
-                                    Text(
-                                      "5",
-                                      style: TextStyle(
-                                          color: lightred,
-                                          fontSize: 10 *
-                                              screenSize.shortestSide *
-                                              0.0012),
-                                    ),
-                                    Icon(
-                                      Icons.arrow_upward,
-                                      size:
-                                          10 * screenSize.shortestSide * 0.0012,
-                                    )
-                                  ],
-                                )
+                                // Row(
+                                //   children: [
+                                //     Text(
+                                //       "5",
+                                //       style: TextStyle(
+                                //           color: lightred,
+                                //           fontSize: 10 *
+                                //               screenSize.shortestSide *
+                                //               0.0012),
+                                //     ),
+                                //     Icon(
+                                //       Icons.arrow_upward,
+                                //       size:
+                                //           10 * screenSize.shortestSide * 0.0012,
+                                //     )
+                                //   ],
+                                // )
                               ],
                             ),
                             Container(
-                                width: 100 * screenSize.width * 0.0007,
-                                height: 70 * screenSize.height * 0.0012,
+                                width: 200 * screenSize.width * 0.0007,
+                                height: 100 * screenSize.height * 0.0012,
                                 child: SfCartesianChart(
                                     isTransposed: true,
                                     primaryXAxis: CategoryAxis(),
                                     series: <ChartSeries>[
                                       BarSeries<SalesData, String>(
-                                          dataSource: [
-                                            // Bind data source
-                                            SalesData('Jan', 35),
-                                            SalesData('Feb', 28),
-                                            SalesData('Mar', 34),
-                                            SalesData('Apr', 32),
-                                            SalesData('May', 40)
-                                          ],
+                                          dataSource: subscriptionchartdata,
                                           xValueMapper: (SalesData sales, _) =>
-                                              sales.year,
+                                              sales.year.toString(),
                                           yValueMapper: (SalesData sales, _) =>
                                               sales.sales)
                                     ]))
@@ -343,7 +462,7 @@ class _HomeState extends State<Home> {
                   child: Container(
                     color: Colors.white,
                     width: screenSize.width * 0.2,
-                    height: screenSize.height * 0.13,
+                    height: screenSize.height * 0.15,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -367,43 +486,36 @@ class _HomeState extends State<Home> {
                                           screenSize.shortestSide *
                                           0.0012),
                                 ),
-                                Row(
-                                  children: [
-                                    Text(
-                                      "5",
-                                      style: TextStyle(
-                                          color: lightred,
-                                          fontSize: 10 *
-                                              screenSize.shortestSide *
-                                              0.0012),
-                                    ),
-                                    Icon(
-                                      Icons.arrow_upward,
-                                      size:
-                                          10 * screenSize.shortestSide * 0.0012,
-                                    )
-                                  ],
-                                )
+                                // Row(
+                                //   children: [
+                                //     Text(
+                                //       "5",
+                                //       style: TextStyle(
+                                //           color: lightred,
+                                //           fontSize: 10 *
+                                //               screenSize.shortestSide *
+                                //               0.0012),
+                                //     ),
+                                //     Icon(
+                                //       Icons.arrow_upward,
+                                //       size:
+                                //           10 * screenSize.shortestSide * 0.0012,
+                                //     )
+                                //   ],
+                                // )
                               ],
                             ),
                             Container(
-                                width: 100 * screenSize.width * 0.0007,
-                                height: 70 * screenSize.height * 0.0012,
+                                width: 200 * screenSize.width * 0.0007,
+                                height: 100 * screenSize.height * 0.0012,
                                 child: SfCartesianChart(
                                     isTransposed: true,
                                     primaryXAxis: CategoryAxis(),
                                     series: <ChartSeries>[
                                       BarSeries<SalesData, String>(
-                                          dataSource: [
-                                            // Bind data source
-                                            SalesData('Jan', 35),
-                                            SalesData('Feb', 28),
-                                            SalesData('Mar', 34),
-                                            SalesData('Apr', 32),
-                                            SalesData('May', 40)
-                                          ],
+                                          dataSource: absentchartdata,
                                           xValueMapper: (SalesData sales, _) =>
-                                              sales.year,
+                                              sales.year.toString(),
                                           yValueMapper: (SalesData sales, _) =>
                                               sales.sales)
                                     ]))
@@ -421,7 +533,7 @@ class _HomeState extends State<Home> {
                   child: Container(
                     color: Colors.white,
                     width: screenSize.width * 0.2,
-                    height: screenSize.height * 0.13,
+                    height: screenSize.height * 0.15,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -445,43 +557,36 @@ class _HomeState extends State<Home> {
                                           screenSize.shortestSide *
                                           0.0012),
                                 ),
-                                Row(
-                                  children: [
-                                    Text(
-                                      "${todaynewjoin}",
-                                      style: TextStyle(
-                                          color: lightred,
-                                          fontSize: 10 *
-                                              screenSize.shortestSide *
-                                              0.0012),
-                                    ),
-                                    Icon(
-                                      Icons.arrow_upward,
-                                      size:
-                                          10 * screenSize.shortestSide * 0.0012,
-                                    )
-                                  ],
-                                )
+                                // Row(
+                                //   children: [
+                                //     Text(
+                                //       "${todaynewjoin}",
+                                //       style: TextStyle(
+                                //           color: lightred,
+                                //           fontSize: 10 *
+                                //               screenSize.shortestSide *
+                                //               0.0012),
+                                //     ),
+                                //     Icon(
+                                //       Icons.arrow_upward,
+                                //       size:
+                                //           10 * screenSize.shortestSide * 0.0012,
+                                //     )
+                                //   ],
+                                // )
                               ],
                             ),
                             Container(
-                                width: 100 * screenSize.width * 0.0007,
-                                height: 70 * screenSize.height * 0.0012,
+                                width: 200 * screenSize.width * 0.0007,
+                                height: 100 * screenSize.height * 0.0012,
                                 child: SfCartesianChart(
                                     isTransposed: true,
                                     primaryXAxis: CategoryAxis(),
                                     series: <ChartSeries>[
                                       BarSeries<SalesData, String>(
-                                          dataSource: [
-                                            // Bind data source
-                                            SalesData('Jan', 35),
-                                            SalesData('Feb', 28),
-                                            SalesData('Mar', 34),
-                                            SalesData('Apr', 32),
-                                            SalesData('May', 40)
-                                          ],
+                                          dataSource: presentchartdata,
                                           xValueMapper: (SalesData sales, _) =>
-                                              sales.year,
+                                              sales.year.toString(),
                                           yValueMapper: (SalesData sales, _) =>
                                               sales.sales)
                                     ]))
@@ -583,7 +688,7 @@ class _HomeState extends State<Home> {
                         SizedBox(
                           width: 220 * screenSize.width * 0.0007,
                           child: Text(
-                            "Today new tgrough refferal",
+                            "Today new through refferal",
                             style: TextStyle(
                               fontSize: 12 * screenSize.shortestSide * 0.0012,
                               fontWeight: FontWeight.bold,
@@ -593,7 +698,7 @@ class _HomeState extends State<Home> {
                         SizedBox(
                           width: 30 * screenSize.width * 0.0007,
                           child: Text(
-                            "${todaynewjoin}",
+                            "${todaynewthroughrefferal}",
                             style: TextStyle(
                               fontSize: 20 * screenSize.shortestSide * 0.0012,
                               fontWeight: FontWeight.bold,
@@ -607,91 +712,91 @@ class _HomeState extends State<Home> {
               ),
             ],
           ),
-          Card(
-            elevation: 3,
-            child: Padding(
-              padding: EdgeInsets.all(8.0 * screenSize.shortestSide * 0.0012),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Statistics",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18 * screenSize.shortestSide * 0.0012),
-                      ),
-                      Card(
-                        elevation: 3,
-                        child: Container(
-                          width: 150 * screenSize.width * 0.0007,
-                          height: 40 * screenSize.height * 0.0012,
-                          color: Colors.white,
-                          child: Padding(
-                            padding: EdgeInsets.all(
-                                8.0 * screenSize.shortestSide * 0.0012),
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  width: 90 * screenSize.width * 0.0007,
-                                  child: Text(
-                                    "Last 6 month",
-                                    style: TextStyle(
-                                        fontSize: 18 *
-                                            screenSize.shortestSide *
-                                            0.0012),
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.arrow_drop_down,
-                                  size: 18 * screenSize.shortestSide * 0.0012,
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  Container(
-                    child: SfCartesianChart(
-                        //  isTransposed: true,
-                        primaryXAxis: CategoryAxis(),
-                        series: <ChartSeries>[
-                          SplineSeries<SalesData, String>(
-                              dataSource: [
-                                // Bind data source
-                                SalesData('Jan', 35),
-                                SalesData('Feb', 28),
-                                SalesData('Mar', 34),
-                                SalesData('Apr', 32),
-                                SalesData('May', 40),
-                                SalesData('June', 40)
-                              ],
-                              xValueMapper: (SalesData sales, _) => sales.year,
-                              yValueMapper: (SalesData sales, _) => sales.sales,
-                              markerSettings: MarkerSettings(isVisible: true)),
-                          SplineSeries<SalesData, String>(
-                              dataSource: [
-                                // Bind data source
-                                SalesData('Jan', 30),
-                                SalesData('Feb', 40),
-                                SalesData('Mar', 20),
-                                SalesData('Apr', 50),
-                                SalesData('May', 25),
-                                SalesData('June', 35)
-                              ],
-                              xValueMapper: (SalesData sales, _) => sales.year,
-                              yValueMapper: (SalesData sales, _) => sales.sales,
-                              markerSettings: MarkerSettings(isVisible: true))
-                        ]),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          // Card(
+          //   elevation: 3,
+          //   child: Padding(
+          //     padding: EdgeInsets.all(8.0 * screenSize.shortestSide * 0.0012),
+          //     child: Column(
+          //       children: [
+          //         Row(
+          //           mainAxisSize: MainAxisSize.max,
+          //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //           children: [
+          //             Text(
+          //               "Statistics",
+          //               style: TextStyle(
+          //                   fontWeight: FontWeight.bold,
+          //                   fontSize: 18 * screenSize.shortestSide * 0.0012),
+          //             ),
+          //             Card(
+          //               elevation: 3,
+          //               child: Container(
+          //                 width: 150 * screenSize.width * 0.0007,
+          //                 height: 40 * screenSize.height * 0.0012,
+          //                 color: Colors.white,
+          //                 child: Padding(
+          //                   padding: EdgeInsets.all(
+          //                       8.0 * screenSize.shortestSide * 0.0012),
+          //                   child: Row(
+          //                     children: [
+          //                       SizedBox(
+          //                         width: 90 * screenSize.width * 0.0007,
+          //                         child: Text(
+          //                           "Last 6 month",
+          //                           style: TextStyle(
+          //                               fontSize: 18 *
+          //                                   screenSize.shortestSide *
+          //                                   0.0012),
+          //                         ),
+          //                       ),
+          //                       Icon(
+          //                         Icons.arrow_drop_down,
+          //                         size: 18 * screenSize.shortestSide * 0.0012,
+          //                       )
+          //                     ],
+          //                   ),
+          //                 ),
+          //               ),
+          //             )
+          //           ],
+          //         ),
+          //         Container(
+          //           child: SfCartesianChart(
+          //               //  isTransposed: true,
+          //               primaryXAxis: CategoryAxis(),
+          //               series: <ChartSeries>[
+          //                 SplineSeries<SalesData, String>(
+          //                     dataSource: [
+          //                       // Bind data source
+          //                       SalesData('Jan', 35),
+          //                       SalesData('Feb', 28),
+          //                       SalesData('Mar', 34),
+          //                       SalesData('Apr', 32),
+          //                       SalesData('May', 40),
+          //                       SalesData('June', 40)
+          //                     ],
+          //                     xValueMapper: (SalesData sales, _) => sales.year,
+          //                     yValueMapper: (SalesData sales, _) => sales.sales,
+          //                     markerSettings: MarkerSettings(isVisible: true)),
+          //                 SplineSeries<SalesData, String>(
+          //                     dataSource: [
+          //                       // Bind data source
+          //                       SalesData('Jan', 30),
+          //                       SalesData('Feb', 40),
+          //                       SalesData('Mar', 20),
+          //                       SalesData('Apr', 50),
+          //                       SalesData('May', 25),
+          //                       SalesData('June', 35)
+          //                     ],
+          //                     xValueMapper: (SalesData sales, _) => sales.year,
+          //                     yValueMapper: (SalesData sales, _) => sales.sales,
+          //                     markerSettings: MarkerSettings(isVisible: true))
+          //               ]),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
           SizedBox(
             height: 15 * screenSize.shortestSide * 0.0012,
           ),
@@ -974,6 +1079,6 @@ class _HomeState extends State<Home> {
 
 class SalesData {
   SalesData(this.year, this.sales);
-  final String year;
+  final int year;
   final double? sales;
 }

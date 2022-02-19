@@ -12,6 +12,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Others extends StatefulWidget {
   const Others({Key? key}) : super(key: key);
@@ -51,6 +52,17 @@ class _OthersState extends State<Others> {
     setState(() {
       ref = data["invite"];
     });
+  }
+
+  Future<void> _launchInBrowser(String url) async {
+    if (!await launch(
+      url,
+      forceSafariVC: false,
+      forceWebView: false,
+      headers: <String, String>{'my_header_key': 'my_header_value'},
+    )) {
+      throw 'Could not launch $url';
+    }
   }
 
   @override
@@ -175,7 +187,10 @@ class _OthersState extends State<Others> {
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              _launchInBrowser(
+                  "https://www.crunchthefitnessstudio.com/s/PRIVACY-POLICY-TEMPLATE-1.docx");
+            },
             child: Padding(
               padding: const EdgeInsets.only(
                   left: 20, right: 20, top: 10, bottom: 10),
@@ -220,60 +235,61 @@ class _OthersState extends State<Others> {
           ),
           GestureDetector(
             onTap: () {
-              showMaterialModalBottomSheet(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                  context: context,
-                  builder: (context) => SizedBox(
-                        height: 200,
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(15),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Rate Us",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 25),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {},
-                                    child: Container(
-                                      child: Center(
-                                          child: Icon(
-                                        Icons.close,
-                                        color: Colors.white,
-                                      )),
-                                      height: 30,
-                                      width: 30,
-                                      decoration: const BoxDecoration(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(5)),
-                                          gradient: LinearGradient(
-                                            begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter,
-                                            colors: [
-                                              Color(0xFFD84040),
-                                              Color(0xFF940001)
-                                            ],
-                                          )),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            ButtonMethodWidget(() {}, 50.0, 350.0, "Save", 15.0)
-                          ],
-                        ),
-                      ));
+              _launchInBrowser("https://g.page/r/CVa_cr1-NMTBEAo/review");
+              // showMaterialModalBottomSheet(
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(15.0),
+              //     ),
+              //     context: context,
+              //     builder: (context) => SizedBox(
+              //           height: 200,
+              //           child: Column(
+              //             children: [
+              //               Padding(
+              //                 padding: const EdgeInsets.all(15),
+              //                 child: Row(
+              //                   mainAxisAlignment:
+              //                       MainAxisAlignment.spaceBetween,
+              //                   children: [
+              //                     Text(
+              //                       "Rate Us",
+              //                       style: TextStyle(
+              //                           fontWeight: FontWeight.bold,
+              //                           fontSize: 25),
+              //                     ),
+              //                     GestureDetector(
+              //                       onTap: () {},
+              //                       child: Container(
+              //                         child: Center(
+              //                             child: Icon(
+              //                           Icons.close,
+              //                           color: Colors.white,
+              //                         )),
+              //                         height: 30,
+              //                         width: 30,
+              //                         decoration: const BoxDecoration(
+              //                             borderRadius: BorderRadius.all(
+              //                                 Radius.circular(5)),
+              //                             gradient: LinearGradient(
+              //                               begin: Alignment.topCenter,
+              //                               end: Alignment.bottomCenter,
+              //                               colors: [
+              //                                 Color(0xFFD84040),
+              //                                 Color(0xFF940001)
+              //                               ],
+              //                             )),
+              //                       ),
+              //                     )
+              //                   ],
+              //                 ),
+              //               ),
+              //               SizedBox(
+              //                 height: 20,
+              //               ),
+              //               ButtonMethodWidget(() {}, 50.0, 350.0, "RateUs", 15.0)
+              //             ],
+              //           ),
+              //         ));
             },
             child: Padding(
               padding: const EdgeInsets.only(
@@ -520,39 +536,46 @@ class _OthersState extends State<Others> {
           //     thickness: 2,
           //   ),
           // ),
-          Padding(
-            padding:
-                const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
-            child: Row(
-              children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: lightred.withOpacity(0.4),
-                    borderRadius: BorderRadius.circular(10),
-                    image: DecorationImage(
-                        image: AssetImage('assets/vuesax-linear-note-4@2x.png'),
-                        scale: 1.3),
+          GestureDetector(
+            onTap: () {
+              _launchInBrowser(
+                  "https://www.crunchthefitnessstudio.com/s/Terms-and-Conditions-1.rtf");
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 20, right: 20, top: 10, bottom: 10),
+              child: Row(
+                children: [
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: lightred.withOpacity(0.4),
+                      borderRadius: BorderRadius.circular(10),
+                      image: DecorationImage(
+                          image:
+                              AssetImage('assets/vuesax-linear-note-4@2x.png'),
+                          scale: 1.3),
+                    ),
                   ),
-                ),
-                SizedBox(
-                  width: 20,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Terms & Conditions",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text("Click to download the document")
-                  ],
-                )
-              ],
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Terms & Conditions",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text("Click to download the document")
+                    ],
+                  )
+                ],
+              ),
             ),
           ),
           Padding(

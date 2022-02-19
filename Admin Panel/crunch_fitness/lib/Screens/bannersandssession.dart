@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crunch_fitness/Constants/size.dart';
 import 'package:crunch_fitness/Screens/addsession.dart';
 import 'package:crunch_fitness/Screens/editsessions.dart';
+import 'package:crunch_fitness/Screens/home_screen.dart';
 import 'package:crunch_fitness/Widgets/buttonwidget.dart';
 import 'package:crunch_fitness/Widgets/iconbuttonwidget.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -281,8 +282,25 @@ class _BannersAndSessionsState extends State<BannersAndSessions> {
                                   SizedBox(
                                     height: 7 * sizefactor,
                                   ),
-                                  icobbuttonWidget(
-                                      () {},
+                                  icobbuttonWidget(() {
+                                    final collection =
+                                        FirebaseFirestore.instance.collection(
+                                            'AppData/Sessions/SessionData');
+                                    collection
+                                        .doc(sessionid[
+                                            index]) // <-- Doc ID to be deleted.
+                                        .delete() // <-- Delete
+                                        .then((_) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute<void>(
+                                          builder: (BuildContext context) =>
+                                              const HomeScreen(),
+                                        ),
+                                      );
+                                    }).catchError((error) =>
+                                            print('Delete failed: $error'));
+                                  },
                                       25 * sizefactor,
                                       Icon(
                                         Icons.delete,

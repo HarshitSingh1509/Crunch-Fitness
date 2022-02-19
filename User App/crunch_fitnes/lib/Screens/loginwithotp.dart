@@ -27,6 +27,7 @@ class _LoginWithOtpState extends State<LoginWithOtp> {
   final formKey = GlobalKey<FormState>();
   TextEditingController textEditingController = TextEditingController();
   StreamController<ErrorAnimationType>? errorController;
+  String otp = "";
   @override
   void initState() {
     errorController = StreamController<ErrorAnimationType>();
@@ -151,7 +152,10 @@ class _LoginWithOtpState extends State<LoginWithOtp> {
                       )
                     ],
                     onCompleted: (v) async {
-                      bool isverified = await loginwithotp(v);
+                      setState(() {
+                        otp = v;
+                      });
+                      bool isverified = await loginwithotp(otp);
                       print(isverified);
                       if (isverified) {
                         if (widget.n == 1) {
@@ -355,7 +359,7 @@ class _LoginWithOtpState extends State<LoginWithOtp> {
                     );
                   },
                   child: Text(
-                    "Registe",
+                    "Register",
                     style: TextStyle(color: Colors.red),
                   ),
                 )
@@ -367,11 +371,25 @@ class _LoginWithOtpState extends State<LoginWithOtp> {
     );
   }
 
-  funct1() {
-    Navigator.push(
-        context,
-        MaterialPageRoute<void>(
-          builder: (BuildContext context) => HomePage(index: 0),
-        ));
+  funct1() async {
+    bool isverified = await loginwithotp(otp);
+    print(isverified);
+    if (isverified) {
+      if (widget.n == 1) {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute<void>(
+              builder: (BuildContext context) => HomePage(
+                index: 0,
+              ),
+            ));
+      } else {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute<void>(
+              builder: (BuildContext context) => const TrainerAttendance(),
+            ));
+      }
+    }
   }
 }

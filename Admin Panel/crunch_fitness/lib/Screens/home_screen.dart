@@ -37,7 +37,6 @@ class _HomeScreenState extends State<HomeScreen> {
     "Members List",
     "Notification",
     "Messages",
-    "Contacts"
   ];
   List<Widget> tabscreens = [
     Home(),
@@ -47,7 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
     MemberList(),
     NotificationSend(),
     Messages(),
-    AboutApp(),
   ];
 
   int selectedindex = 0;

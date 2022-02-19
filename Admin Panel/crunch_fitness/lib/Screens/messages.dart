@@ -14,33 +14,42 @@ class Messages extends StatefulWidget {
 
 class _MessagesState extends State<Messages> {
   List<dynamic> alldata = [];
+  bool isload = false;
   List<dynamic> profiledata = [];
+  bool isloading = false;
   Future<void> getmessage() async {
     CollectionReference _collectionRef = FirebaseFirestore.instance
-        .collection('/AppData/HelpandSupport/allmessages');
+        .collection('/AppData/HelpandSupport/allmessages/');
     await _collectionRef.get().then((value) async {
-      value.docs.forEach(
-        (element) async {
-          var data = element.get("uid");
-          print(element.get("uid"));
-          DocumentSnapshot docsnp = await FirebaseFirestore.instance
-              .doc('/Users/${element.get("uid")}')
-              .get();
-          setState(() {
+      print(true);
+      print(value.docs.first.data());
+      value.docs.forEach((element) async {
+        var data = element.get("uid");
+        print(element.get("uid"));
+        DocumentSnapshot docsnp =
+            await FirebaseFirestore.instance.doc('/Users/$data').get();
+        var dataf = docsnp.data() as Map;
+        setState(
+          () {
             profiledata
-                .add({"name": docsnp["name"], "imageurl": docsnp["imageurl"]});
-          });
-          print(profiledata);
-          setState(() {
-            alldata.add(element.data());
-          });
-          print(alldata);
-        },
-      );
-      // setState(() {
-      //   alldata = value.docs.map((doc) => doc.data()).toList();
-      //   print(alldata);
-      // });
+                .add({"name": dataf['name'], "imageurl": dataf["imageurl"]});
+
+            print(profiledata);
+            setState(() {
+              alldata.add(element.data());
+            });
+            print(alldata);
+          },
+        );
+        // setState(() {
+        //   alldata = value.docs.map((doc) => doc.data()).toList();
+        //   print(alldata);
+        // });
+      });
+    }).then((value) {
+      setState(() {
+        isload = false;
+      });
     });
   }
 
@@ -68,141 +77,152 @@ class _MessagesState extends State<Messages> {
               left: 40 * sizefactor,
               right: 40 * sizefactor,
               top: 100 * sizefactor),
-          child: Card(
-            child: Padding(
-              padding: EdgeInsets.all(20 * sizefactor),
-              child: Row(
-                // mainAxisAlignment: MainAxisAlignment.center,
-                // mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    height: 500 * heightfactor,
-                    width: 350 * widthfactor,
-                    child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: alldata.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selectedindex = index;
-                              });
-                            },
-                            child: SizedBox(
-                              width: 350 * widthfactor,
-                              child: Column(
-                                children: [
-                                  SizedBox(
+          child: isload
+              ? CircularProgressIndicator()
+              : Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(20 * sizefactor),
+                    child: Row(
+                      // mainAxisAlignment: MainAxisAlignment.center,
+                      // mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          height: 500 * heightfactor,
+                          width: 350 * widthfactor,
+                          child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: alldata.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      selectedindex = index;
+                                    });
+                                  },
+                                  child: SizedBox(
                                     width: 350 * widthfactor,
-                                    child: Row(
+                                    child: Column(
                                       children: [
-                                        CircleAvatar(
-                                          radius: 25 * sizefactor,
-                                          child: Image(
-                                              height: 50 * heightfactor,
-                                              width: 50 * widthfactor,
-                                              image: NetworkImage(profiledata[
-                                                      index]["imageurl"] ??
-                                                  "https://firebasestorage.googleapis.com/v0/b/crunch-fitness-efeba.appspot.com/o/blank-profile-picture-973460_1280.png?alt=media&token=3442a53d-a890-4f36-9b59-0d90352544e7")),
-                                        ),
                                         SizedBox(
-                                          width: 10 * widthfactor,
-                                        ),
-                                        Column(
-                                          children: [
-                                            Text(
-                                              profiledata[index]["name"] ?? "",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 18 * sizefactor),
-                                            ),
-                                            SizedBox(
-                                              height: 15 * heightfactor,
-                                            ),
-                                            SizedBox(
-                                                width: 180 * widthfactor,
+                                          width: 350 * widthfactor,
+                                          child: Row(
+                                            children: [
+                                              CircleAvatar(
+                                                radius: 25 * sizefactor,
+                                                child: Image(
+                                                    height: 50 * heightfactor,
+                                                    width: 50 * widthfactor,
+                                                    image: NetworkImage(
+                                                        profiledata[index]
+                                                                ["imageurl"] ??
+                                                            "https://firebasestorage.googleapis.com/v0/b/crunch-fitness-efeba.appspot.com/o/blank-profile-picture-973460_1280.png?alt=media&token=3442a53d-a890-4f36-9b59-0d90352544e7")),
+                                              ),
+                                              SizedBox(
+                                                width: 10 * widthfactor,
+                                              ),
+                                              Column(
+                                                children: [
+                                                  Text(
+                                                    profiledata[index]
+                                                            ["name"] ??
+                                                        "",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize:
+                                                            18 * sizefactor),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 15 * heightfactor,
+                                                  ),
+                                                  SizedBox(
+                                                      width: 180 * widthfactor,
+                                                      child: Text(
+                                                        alldata[index]
+                                                            ["message"],
+                                                        style: TextStyle(
+                                                            fontSize: 18 *
+                                                                sizefactor),
+                                                        maxLines: 1,
+                                                      ))
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                width: 15 * widthfactor,
+                                              ),
+                                              SizedBox(
+                                                width: 50 * widthfactor,
                                                 child: Text(
-                                                  alldata[index]["message"],
+                                                  alldata[index]["time"] ?? "",
                                                   style: TextStyle(
                                                       fontSize:
                                                           18 * sizefactor),
-                                                  maxLines: 1,
-                                                ))
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          width: 15 * widthfactor,
-                                        ),
-                                        SizedBox(
-                                          width: 50 * widthfactor,
-                                          child: Text(
-                                            alldata[index]["time"] ?? "",
-                                            style: TextStyle(
-                                                fontSize: 18 * sizefactor),
+                                                ),
+                                              )
+                                            ],
                                           ),
-                                        )
+                                        ),
+                                        Divider()
                                       ],
                                     ),
                                   ),
-                                  Divider()
-                                ],
-                              ),
-                            ),
-                          );
-                        }),
+                                );
+                              }),
+                        ),
+                        SizedBox(
+                            height: 500 * heightfactor,
+                            width: 500 * widthfactor,
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    CircleAvatar(
+                                      child: Image(
+                                          height: 50 * heightfactor,
+                                          width: 50 * widthfactor,
+                                          image: NetworkImage(profiledata[
+                                                  selectedindex]["imageurl"] ??
+                                              "https://firebasestorage.googleapis.com/v0/b/crunch-fitness-efeba.appspot.com/o/blank-profile-picture-973460_1280.png?alt=media&token=3442a53d-a890-4f36-9b59-0d90352544e7")),
+                                    ),
+                                    SizedBox(
+                                      width: 10 * widthfactor,
+                                    ),
+                                    Column(
+                                      children: [
+                                        Text(
+                                          profiledata[selectedindex]["name"] ??
+                                              "",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18 * widthfactor),
+                                        ),
+                                        SizedBox(
+                                          height: 15 * heightfactor,
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      width: 15 * widthfactor,
+                                    ),
+                                    Text(
+                                      alldata[selectedindex]["time"] ?? "",
+                                      style:
+                                          TextStyle(fontSize: 18 * sizefactor),
+                                    )
+                                  ],
+                                ),
+                                Divider(),
+                                Text(
+                                  alldata[selectedindex]["message"] ?? "",
+                                  style: TextStyle(fontSize: 18 * sizefactor),
+                                )
+                              ],
+                            )),
+                      ],
+                    ),
                   ),
-                  SizedBox(
-                      height: 500 * heightfactor,
-                      width: 500 * widthfactor,
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              CircleAvatar(
-                                child: Image(
-                                    height: 50 * heightfactor,
-                                    width: 50 * widthfactor,
-                                    image: NetworkImage(profiledata[
-                                            selectedindex]["imageurl"] ??
-                                        "https://firebasestorage.googleapis.com/v0/b/crunch-fitness-efeba.appspot.com/o/blank-profile-picture-973460_1280.png?alt=media&token=3442a53d-a890-4f36-9b59-0d90352544e7")),
-                              ),
-                              SizedBox(
-                                width: 10 * widthfactor,
-                              ),
-                              Column(
-                                children: [
-                                  Text(
-                                    profiledata[selectedindex]["name"] ?? "",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18 * widthfactor),
-                                  ),
-                                  SizedBox(
-                                    height: 15 * heightfactor,
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                width: 15 * widthfactor,
-                              ),
-                              Text(
-                                alldata[selectedindex]["time"] ?? "",
-                                style: TextStyle(fontSize: 18 * sizefactor),
-                              )
-                            ],
-                          ),
-                          Divider(),
-                          Text(
-                            alldata[selectedindex]["message"] ?? "",
-                            style: TextStyle(fontSize: 18 * sizefactor),
-                          )
-                        ],
-                      )),
-                ],
-              ),
-            ),
-          ),
+                ),
         ),
       ),
     );
