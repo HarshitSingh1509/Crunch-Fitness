@@ -269,9 +269,11 @@ class _AttendanceState extends State<Attendance> {
                               onChanged: ((value) {
                                 setState(() {
                                   userattendance = usersearch
-                                      .where((element) => element["name"]
-                                          .toLowerCase()
-                                          .contains(value.toLowerCase()))
+                                      .where((element) =>
+                                          element["name"] ??
+                                          ""
+                                              .toLowerCase()
+                                              .contains(value.toLowerCase()))
                                       .toList();
                                 });
                               }),
@@ -299,7 +301,7 @@ class _AttendanceState extends State<Attendance> {
                                 } else {
                                   print(activityid[index]);
                                   getactivityattendance(
-                                      otheractivities[index]["name"]);
+                                      otheractivities[index]["name"] ?? "");
                                 }
                                 // getotherattendance(
                                 //     otheractivities[selectedindex]["name"]);
@@ -308,7 +310,7 @@ class _AttendanceState extends State<Attendance> {
                             child: Padding(
                               padding: const EdgeInsets.all(5),
                               child: Column(children: [
-                                Text(otheractivities[index]["name"]),
+                                Text(otheractivities[index]["name"] ?? ""),
                                 SizedBox(
                                   height: 5,
                                 ),
@@ -343,7 +345,7 @@ class _AttendanceState extends State<Attendance> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(userattendance[index]["name"]),
+                                Text(userattendance[index]["name"] ?? ""),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,

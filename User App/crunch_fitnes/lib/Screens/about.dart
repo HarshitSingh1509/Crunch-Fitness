@@ -2,6 +2,7 @@ import 'package:crunch_fitnes/Constants/colors.dart';
 import 'package:crunch_fitnes/Widgets/buttonwidget.dart';
 import 'package:email_launcher/email_launcher.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class About extends StatefulWidget {
@@ -71,7 +72,10 @@ class _AboutState extends State<About> {
                   SizedBox(
                     width: 15,
                   ),
-                  CircleAvatar()
+                  CircleAvatar(
+                    backgroundImage:
+                        NetworkImage(GetStorage().read('profileimg') ?? ""),
+                  )
                 ],
               )
             ],
@@ -90,7 +94,7 @@ class _AboutState extends State<About> {
         Wrap(
           children: [
             Text(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam eleifend ipsum sit amet tellus tristique, non fermentum justo consectetur. Nullam lacinia congue urna id bibendum. Ut quis nisl et arcu vulputate pharetra vel in quam. Donec porttitor risus id finibus interdum. Aenean turpis lacus, rhoncus vitae sem eu, volutpat dictum libero. Aenean nisi magna, mattis sit amet congue id, ullamcorper vel nisl. Aenean vel erat velit. Duis vel metus neque. Vivamus ac ultrices massa. Integer auctor molestie felis sit amet tempus. Donec venenatis mi in metus sagittis, ac euismod quam aliquet. Suspendisse aliquam magna consectetur magna euismod vulputate. Integer convallis."),
+                "Get ready to tear down obstacles of the mind and body. We at Crunch The Fitness Studio believe that getting yourself back to work means setting your own pace. So start your journey with us today. "),
           ],
         ),
         SizedBox(
@@ -106,7 +110,7 @@ class _AboutState extends State<About> {
         Wrap(
           children: [
             Text(
-                "onec porttitor risus id finibus interdum. Aenean turpis lacus, rhoncus vitae sem eu, volutpat dictum libero. Aenean nisi magna, mattis sit amet congue id, ullamcorper vel nisl. Aenean vel erat velit. Duis vel metus neque. Vivamus ac ultrices massa. Integer auctor molestie felis sit amet tempus. Donec venenatis mi in metus sagittis, ac euismod quam aliquet. Suspendisse aliquam magna consectetur magna euismod vulputate. Integer convallis."),
+                "Sukanta Sarani, Ward no-5, \n Krishnanagar, Nadia,  West Bengal - 741101"),
           ],
         ),
         SizedBox(
@@ -127,7 +131,7 @@ class _AboutState extends State<About> {
         ),
         Wrap(
           children: [
-            Text("onec porttitor risus id finibus interdum. A"),
+            Text("Monday to Saturday \n 6am to 10pm"),
           ],
         ),
         SizedBox(
@@ -137,14 +141,22 @@ class _AboutState extends State<About> {
           "Equipments",
           style: TextStyle(fontSize: 18, color: lightred),
         ),
-        Text("Equiment1"),
-        Text("Equiment1"),
-        Text("Equiment1"),
-        Text("Equiment1"),
-        Text("Equiment1"),
-        Text("Equiment1"),
-        Text("Equiment1"),
-        Text("Equiment1"),
+        Text("Battle Ropes & Pulleys"),
+        Text("TRX"),
+        Text("Barbells & Bumper Plates"),
+        Text("Free Weights"),
+        Text("Weight Training Arena"),
+        Text("Step Benches"),
+        Text("Treadmills & Cross Trainers"),
+        Text("Spin Bikes"),
+        Text("Air Rower & Air Bike"),
+        Text("Yoga Arena"),
+        Text("Studio Tire & Kettlebells"),
+        Text("Custom CrossFit Course"),
+        Text("Lockers"),
+        Text("Changing Rooms"),
+        Text("Lounge"),
+        Text("Zumba Arena"),
         Row(
           children: [
             IconButton(

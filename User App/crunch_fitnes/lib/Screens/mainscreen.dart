@@ -7,6 +7,7 @@ import 'package:crunch_fitnes/Constants/colors.dart';
 import 'package:crunch_fitnes/Screens/markattendance.dart';
 import 'package:crunch_fitnes/Screens/notification.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:get_storage/get_storage.dart';
@@ -28,14 +29,27 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    firebase_storage.FirebaseStorage storage =
-        firebase_storage.FirebaseStorage.instance;
-    firebase_storage.Reference ref =
-        firebase_storage.FirebaseStorage.instance.ref('Banners/');
+    // firebase_storage.FirebaseStorage storage =
+    //     firebase_storage.FirebaseStorage.instance;
+    // firebase_storage.Reference ref =
+    //     firebase_storage.FirebaseStorage.instance.ref('Banners/');
     listExample();
     addnewuser();
     loadsession();
+    updatetoken();
     super.initState();
+  }
+
+  Widget? abc = Container();
+  Future<void> updatetoken() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String uid = auth.currentUser!.uid;
+    String? token = await FirebaseMessaging.instance.getToken();
+    CollectionReference users = FirebaseFirestore.instance.collection('Users');
+    print(token);
+    users.doc(auth.currentUser!.uid).set(
+        {'token': await FirebaseMessaging.instance.getToken()},
+        SetOptions(merge: true));
   }
 
   Future<void> addnewuser() async {
@@ -68,41 +82,54 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Future<void> listExample() async {
-    firebase_storage.ListResult result = await firebase_storage
-        .FirebaseStorage.instance
-        .ref()
-        .child('Banners')
-        .listAll();
-    result.items.forEach((element) async {
-      print(await element.getDownloadURL());
-      String str = await element.getDownloadURL();
-      setState(() {
-        images.add(str);
-        imageSliders = images
-            .map((item) => Container(
-                  child: Container(
-                    margin: EdgeInsets.all(5.0),
-                    child: ClipRRect(
-                        borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                        child: Stack(
-                          children: <Widget>[
-                            Image.network(item,
-                                fit: BoxFit.cover, width: 1000.0),
-                          ],
-                        )),
-                  ),
-                ))
-            .toList();
-      });
-    });
+    String path = "AppData/Banners";
+    DocumentSnapshot _collectionRef =
+        await FirebaseFirestore.instance.doc(path).get();
+    dynamic data = _collectionRef.data();
+    print("******");
+    print(data["Banner2"]);
+    images.add(data["Banner1"]);
+    images.add(data["Banner2"]);
 
-    result.items.forEach((firebase_storage.Reference ref) {
-      print('Found file: $ref');
-    });
+    images.add(data["Banner3"]);
+    images.add(data["Banner4"]);
+    images.add(data["Banner5"]);
+    images.add(data["Banner6"]);
+    print(images);
+    // firebase_storage.ListResult result = await firebase_storage
+    //     .FirebaseStorage.instance
+    //     .ref()
+    //     .child('Banners')
+    //     .listAll();
+    // result.items.forEach((element) async {
+    //   print(await element.getDownloadURL());
+    //   String str = await element.getDownloadURL();
+    //   setState(() {
+    //     images.add(str);
+    imageSliders = images
+        .map((item) => Container(
+              child: Container(
+                margin: EdgeInsets.all(5.0),
+                child: ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                    child: Stack(
+                      children: <Widget>[
+                        Image.network(item, fit: BoxFit.cover, width: 1000.0),
+                      ],
+                    )),
+              ),
+            ))
+        .toList();
+    //    });
+    // });
 
-    result.prefixes.forEach((firebase_storage.Reference ref) {
-      print('Found directory: $ref');
-    });
+    // result.items.forEach((firebase_storage.Reference ref) {
+    //   print('Found file: $ref');
+    // });
+
+    // result.prefixes.forEach((firebase_storage.Reference ref) {
+    //   print('Found directory: $ref');
+    // });
   }
 
   // final List<String> imgList = [
@@ -159,8 +186,9 @@ class _MainScreenState extends State<MainScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Image(
-                    image: AssetImage("assets/crunch_name.png"),
+                    image: AssetImage("assets/Crunch 1.jpg"),
                     height: 35,
+                    width: 250,
                   ),
                   Row(
                     children: [
@@ -258,6 +286,7 @@ class _MainScreenState extends State<MainScreen> {
                 shrinkWrap: true,
                 itemCount: session.length,
                 itemBuilder: (BuildContext context, int index) {
+                  //  print(session[index]["imageurl"]);
                   return Padding(
                     padding:
                         const EdgeInsets.only(left: 15, right: 15, bottom: 15),
@@ -269,10 +298,24 @@ class _MainScreenState extends State<MainScreen> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Image(
-                                height: 80,
-                                image:
-                                    NetworkImage(session[index]["imageurl"])),
+                            child: session[index]["imageurl"] == "" ||
+                                    session[index]["imageurl"] == null
+                                ? Image.network(
+                                    session[index]["imageurl"],
+                                    errorBuilder: (BuildContext context,
+                                        Object exception,
+                                        StackTrace? stackTrace) {
+                                      return Container();
+                                    },
+                                  )
+
+                                // Image(
+                                //     height: 80,
+                                //     image:
+
+                                //      NetworkImageWithRetry(
+                                //         session[index]["imageurl"]))
+                                : Container(),
                           ),
                           Expanded(
                             child: Padding(

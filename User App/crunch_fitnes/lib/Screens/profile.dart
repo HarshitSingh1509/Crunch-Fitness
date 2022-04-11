@@ -27,6 +27,7 @@ class _ProfileState extends State<Profile> {
 //   String phone1 = "";
   String profileimg = profile;
   late dynamic data;
+  final f = new DateFormat('dd/MM/yyyy');
   @override
   void initState() {
     getuserdata();
@@ -327,7 +328,7 @@ class _ProfileState extends State<Profile> {
                         style: TextStyle(fontSize: 15, color: darkred),
                       ),
                       Text(
-                        "Expiry date of subscription ${DateFormat.yMd().format((topicdata[index]["enddate"].toDate()))}",
+                        "Expiry date of subscription ${f.format((topicdata[index]["enddate"].toDate()))}",
                         style: TextStyle(),
                       ),
                       Padding(
@@ -354,15 +355,27 @@ class _ProfileState extends State<Profile> {
                                     ],
                                   ),
                                   ButtonMethodWidget(() {
+                                    print(topicdata[0].data());
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute<void>(
                                         builder: (BuildContext context) =>
                                             Payment(
-                                          amount: double.parse(
-                                              topicdata[index]["price"]),
-                                          duration: double.parse(
-                                              topicdata[index]["duration"]),
+                                          amount: double.parse(topicdata[index]
+                                                  ["price"]
+                                              .toString()),
+                                          duration: DateTime.parse(
+                                                      topicdata[index]
+                                                              ["startdate"]
+                                                          .toDate()
+                                                          .toString())
+                                                  .difference(DateTime.parse(
+                                                      topicdata[index]
+                                                              ["enddate"]
+                                                          .toDate()
+                                                          .toString()))
+                                                  .inDays /
+                                              30,
                                           name: topicdata[index]["name"],
                                           topicid: topicid[index],
                                           isotheractivity: false,
@@ -404,7 +417,7 @@ class _ProfileState extends State<Profile> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Expiry date of subscription ${DateFormat.yMd().format((activitydata[i]["enddate"].toDate()))}",
+                          "Expiry date of subscription ${f.format((activitydata[i]["enddate"].toDate()))}",
                           style: TextStyle(),
                         ),
                         Card(
@@ -434,10 +447,12 @@ class _ProfileState extends State<Profile> {
                                       MaterialPageRoute<void>(
                                         builder: (BuildContext context) =>
                                             Payment(
-                                          amount: double.parse(
-                                              activitydata[i]["price"]),
-                                          duration: double.parse(
-                                              activitydata[i]["duration"]),
+                                          amount: double.parse(activitydata[i]
+                                                  ["price"]
+                                              .toString()),
+                                          duration: double.parse(activitydata[i]
+                                                  ["duration"]
+                                              .toString()),
                                           name: activitydata[i]["name"],
                                           topicid: activityid[i],
                                           isotheractivity: true,

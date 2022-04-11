@@ -1,4 +1,4 @@
-package com.example.crunch_fitnes
+package com.cws.crunch_fitnes
 
 import io.flutter.embedding.android.FlutterActivity
 

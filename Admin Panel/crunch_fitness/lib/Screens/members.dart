@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crunch_fitness/Constants/colors.dart';
+import 'package:crunch_fitness/Screens/addnewplantouser.dart';
 import 'package:crunch_fitness/Widgets/buttonwidget.dart';
 import 'package:crunch_fitness/Widgets/iconbuttonwidget.dart';
 import 'package:flutter/material.dart';
@@ -266,7 +267,7 @@ class _MembersState extends State<Members> {
                     SizedBox(
                       height: 20,
                     ),
-                    Text("Member from 11/12/2022")
+                    //    Text("Member from 11/12/2022")
                   ],
                 ),
               ),
@@ -274,6 +275,16 @@ class _MembersState extends State<Members> {
                 width: screenSize.width * 0.30,
                 child: Column(
                   children: [
+                    ButtonMethodWidget(() {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (BuildContext context) => Plans(
+                            id: widget.id,
+                          ),
+                        ),
+                      );
+                    }, 70, 150, " Add New Plan", 15),
                     ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
@@ -314,7 +325,7 @@ class _MembersState extends State<Members> {
                                       }, SetOptions(merge: true)).then((value) {
                                         setState(() {
                                           topicdata[index]["enddate"] =
-                                              selectedDate1;
+                                              Timestamp.fromDate(selectedDate1);
                                         });
                                         //  data["isactive"] = !data["isactive"]
                                       });

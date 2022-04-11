@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crunch_fitness/Constants/colors.dart';
 import 'package:crunch_fitness/Widgets/buttonwidget.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class NotificationSend extends StatefulWidget {
   const NotificationSend({Key? key}) : super(key: key);
@@ -18,18 +21,26 @@ class _NotificationSendState extends State<NotificationSend> {
     CollectionReference _collectionRef =
         FirebaseFirestore.instance.collection('/Users');
     QuerySnapshot querySnapshot = await _collectionRef.get();
-    querySnapshot.docs.forEach((element1) async {
+    for (var element1 in querySnapshot.docs) {
       QuerySnapshot _collectionRefdoc = await FirebaseFirestore.instance
           .collection('/Users/${element1.id}/Subscription')
           .get();
-      _collectionRefdoc.docs.forEach((element) {
+      for (var element in _collectionRefdoc.docs) {
         if ((element["enddate"] ?? Timestamp(0, 0))
                 .compareTo(Timestamp(n * 24 * 60 * 60 * 100, 0)) >
             0) {
-          setState(() {
+          setState(() async {
             CollectionReference _collectionRef1 = FirebaseFirestore.instance
                 .collection('/Users/${element1.id}/Notification');
+            DocumentReference doc =
+                FirebaseFirestore.instance.doc("/Users/${element1.id}/");
+            await doc.get().then((snapshot) {
+              print(snapshot.get("token"));
 
+              setState(() {
+                usertoken.add(snapshot.get("token"));
+              });
+            });
             _collectionRef1.add({
               'body': message.text,
               'head': topic.text,
@@ -37,22 +48,29 @@ class _NotificationSendState extends State<NotificationSend> {
               'time': Timestamp.fromDate(DateTime.now())
             });
             user.add(element1.id);
-            print(user.length);
           });
         }
-      });
+      }
 
       QuerySnapshot _collectionRefdoc1 = await FirebaseFirestore.instance
           .collection('/Users/${element1.id}/OtherActivities')
           .get();
-      _collectionRefdoc1.docs.forEach((element) {
+      for (var element in _collectionRefdoc1.docs) {
         if ((element["enddate"] ?? Timestamp(0, 0))
                 .compareTo(Timestamp(n * 24 * 60 * 60 * 100, 0)) >
             0) {
-          setState(() {
+          setState(() async {
             CollectionReference _collectionRef1 = FirebaseFirestore.instance
                 .collection('/Users/${element1.id}/Notification');
+            DocumentReference doc =
+                FirebaseFirestore.instance.doc("/Users/${element1.id}/");
+            await doc.get().then((snapshot) {
+              print(snapshot.get("token"));
 
+              setState(() {
+                usertoken.add(snapshot.get("token"));
+              });
+            });
             _collectionRef1.add({
               'body': message.text,
               'head': topic.text,
@@ -60,11 +78,40 @@ class _NotificationSendState extends State<NotificationSend> {
               'time': Timestamp.fromDate(DateTime.now())
             });
             user.add(element1.id);
-            print(user.length);
           });
         }
-      });
+      }
+    }
+  }
+
+  sendupdate() async {
+    print("Sending notification");
+    print(usertoken);
+    var headers = {
+      'Authorization':
+          'key=AAAAI6jQ57M:APA91bFpsOJ1-DUkAvahNnm0ipzOnwAqgV_MDrZR2yj6Lba7rgQBe3OGpyuJAhtASvSANRmEzMCDpEJy2HUXHPx_Pa_QSb2k4j0K290zHkrpsJT6AoKWGKgDlAyMbBCe_zOZrMkQUCyV',
+      'Content-Type': 'application/json'
+    };
+    var request =
+        http.Request('POST', Uri.parse('https://fcm.googleapis.com/fcm/send'));
+    request.body = json.encode({
+      "registration_ids": usertoken,
+      "collapse_key": "type_a",
+      "notification": {"body": message.text, "title": topic.text},
+      "data": {
+        "body": message.text,
+        "title": topic.text,
+      }
     });
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      print(await response.stream.bytesToString());
+    } else {
+      print(response.reasonPhrase);
+    }
   }
 
   TextEditingController topic = TextEditingController();
@@ -75,12 +122,21 @@ class _NotificationSendState extends State<NotificationSend> {
     CollectionReference _collectionRef =
         FirebaseFirestore.instance.collection('/Users');
     QuerySnapshot querySnapshot = await _collectionRef.get();
-    querySnapshot.docs.forEach((element1) async {
+    for (var element1 in querySnapshot.docs) {
       QuerySnapshot _collectionRefdoc = await FirebaseFirestore.instance
           .collection('/Users/${element1.id}/Subscription')
           .get();
-      _collectionRefdoc.docs.forEach((element) {
-        setState(() {
+      for (var element in _collectionRefdoc.docs) {
+        setState(() async {
+          DocumentReference doc =
+              FirebaseFirestore.instance.doc("/Users/${element1.id}/");
+          await doc.get().then((snapshot) {
+            print(snapshot.get("token"));
+
+            setState(() {
+              usertoken.add(snapshot.get("token"));
+            });
+          });
           CollectionReference _collectionRef1 = FirebaseFirestore.instance
               .collection('/Users/${element1.id}/Notification');
 
@@ -91,18 +147,25 @@ class _NotificationSendState extends State<NotificationSend> {
             'time': Timestamp.fromDate(DateTime.now())
           });
           user.add(element1.id);
-          print(user);
         });
-      });
+      }
 
       QuerySnapshot _collectionRefdoc1 = await FirebaseFirestore.instance
           .collection('/Users/${element1.id}/OtherActivities')
           .get();
-      _collectionRefdoc1.docs.forEach((element) {
-        setState(() {
+      for (var element in _collectionRefdoc1.docs) {
+        setState(() async {
           CollectionReference _collectionRef1 = FirebaseFirestore.instance
               .collection('/Users/${element1.id}/Notification');
+          DocumentReference doc =
+              FirebaseFirestore.instance.doc("/Users/${element1.id}/");
+          await doc.get().then((snapshot) {
+            print(snapshot.get("token"));
 
+            setState(() {
+              usertoken.add(snapshot.get("token"));
+            });
+          });
           _collectionRef1.add({
             'body': message.text,
             'head': topic.text,
@@ -110,22 +173,30 @@ class _NotificationSendState extends State<NotificationSend> {
             'time': Timestamp.fromDate(DateTime.now())
           });
           user.add(element1.id);
-          print(user);
         });
-      });
-    });
+      }
+    }
   }
 
+  List<String> usertoken = [];
   Future<void> alluser(int n) async {
     user = [];
     double sum = 0;
     CollectionReference _collectionRef =
         FirebaseFirestore.instance.collection('/Users');
     QuerySnapshot querySnapshot = await _collectionRef.get();
-    querySnapshot.docs.forEach((element1) async {
+    for (var element1 in querySnapshot.docs) {
       CollectionReference _collectionRef1 = FirebaseFirestore.instance
           .collection('/Users/${element1.id}/Notification');
+      DocumentReference doc =
+          FirebaseFirestore.instance.doc("/Users/${element1.id}/");
+      await doc.get().then((snapshot) {
+        print(snapshot.get("token"));
 
+        setState(() {
+          usertoken.add(snapshot.get("token"));
+        });
+      });
       _collectionRef1.add({
         'body': message.text,
         'head': topic.text,
@@ -133,7 +204,9 @@ class _NotificationSendState extends State<NotificationSend> {
         'time': Timestamp.fromDate(DateTime.now())
       });
       user.add(element1.id);
-    });
+    }
+    print("done");
+    // sendupdate();
   }
 
   bool checkedValue = false;
@@ -271,7 +344,6 @@ class _NotificationSendState extends State<NotificationSend> {
             height: 30,
           ),
           ButtonMethodWidget(() async {
-            print(checkedValue3);
             if (checkedValue1) {
               await totalsubsintime(7)
                   // .then((value) {
@@ -338,25 +410,15 @@ class _NotificationSendState extends State<NotificationSend> {
                       }));
             }
             if (checkedValue) {
-              await alluser(6)
-                  // .then((value) {
-                  //   for (int i = 0; i < user.length; i++) {
-                  //     CollectionReference _collectionRef1 = FirebaseFirestore
-                  //         .instance
-                  //         .collection('/Users/${user[i]}/Notification');
-
-                  //     _collectionRef1.add({
-                  //       'body': message.text,
-                  //       'head': topic.text,
-                  //       'isseen': false,
-                  //       'time': Timestamp.fromDate(DateTime.now())
-                  //     });
-                  //   }
-                  // })
-                  .then((value) => setState(() {
-                        topic.text = "";
-                        message.text = "";
-                      }));
+              await alluser(6).then(
+                (value) {
+                  sendupdate();
+                  setState(() {
+                    topic.text = "";
+                    message.text = "";
+                  });
+                },
+              );
             }
           }, 50, 250, "Send Notification", 15)
         ],

@@ -3,6 +3,7 @@ import 'package:crunch_fitness/Constants/size.dart';
 import 'package:crunch_fitness/Screens/addsession.dart';
 import 'package:crunch_fitness/Widgets/buttonwidget.dart';
 import 'package:crunch_fitness/Widgets/iconbuttonwidget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Messages extends StatefulWidget {
@@ -53,6 +54,7 @@ class _MessagesState extends State<Messages> {
     });
   }
 
+  Future<void> gettoken() async {}
   int selectedindex = 0;
   @override
   void initState() {

@@ -8,6 +8,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'dart:math';
 
+import 'package:url_launcher/url_launcher.dart';
+
 class Payment extends StatefulWidget {
   Payment(
       {required this.amount,
@@ -29,6 +31,17 @@ class _PaymentState extends State<Payment> {
   static const platform = const MethodChannel("razorpay_flutter");
 
   late Razorpay _razorpay;
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    // Use `Uri` to ensure that `phoneNumber` is properly URL-encoded.
+    // Just using 'tel:$phoneNumber' would create invalid URLs in some cases,
+    // such as spaces in the input, which would cause `launch` to fail on some
+    // platforms.
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    await launch(launchUri.toString());
+  }
 
   @override
   void initState() {
@@ -236,7 +249,9 @@ class _PaymentState extends State<Payment> {
                       Text("Contact Us to avail the scheme")
                     ],
                   ),
-                  ButtonMethodWidget(() {}, 35.0, 100.0, "Contact Us", 12.0)
+                  ButtonMethodWidget(() {
+                    _makePhoneCall("+91-7872707877");
+                  }, 35.0, 100.0, "Contact Us", 12.0)
                 ],
               ),
             )),

@@ -9,6 +9,7 @@ import 'package:crunch_fitnes/Screens/loginwithotp.dart';
 import 'package:crunch_fitnes/Screens/trainerattendance.dart';
 import 'package:crunch_fitnes/Widgets/buttonwidget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -69,10 +70,13 @@ class _RegisterState extends State<Register> {
 // String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
 //     length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
   Future<void> addUser(String name, String email, String number, String adress,
-      String refferid) {
+      String refferid) async {
     // Call the user's CollectionReference to add a new user
     FirebaseAuth auth = FirebaseAuth.instance;
     String uid = auth.currentUser!.uid;
+    String? token = await FirebaseMessaging.instance.getToken();
+    print(token);
+    //  print(auth.currentUser!.refreshToken.);
     CollectionReference users = FirebaseFirestore.instance.collection('Users');
     return users.doc(auth.currentUser!.uid).set({
       'name': name,
@@ -83,7 +87,8 @@ class _RegisterState extends State<Register> {
       'isactive': true,
       'aadharurl': img,
       'address': adress,
-      'refferedby': refferid
+      'refferedby': refferid,
+      'token': await FirebaseMessaging.instance.getToken()
     }).then((value) {
       CollectionReference _collectionRef1 =
           FirebaseFirestore.instance.collection('/Users/$uid/Notification');

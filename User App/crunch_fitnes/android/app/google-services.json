@@ -7,6 +7,43 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:153156118451:android:f4948243bdbe8db5a58dc6",
+        "android_client_info": {
+          "package_name": "com.cws.crunch_fitnes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "153156118451-rltqeobjk0hna1cdf8l5pv0mfq23bu6u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cws.crunch_fitnes",
+            "certificate_hash": "cb58a4cd1d9255fd58d555e1a22f98c20860d3fb"
+          }
+        },
+        {
+          "client_id": "153156118451-hmmktce4drqgnk0hdqrq3c2rppcrnbif.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-GekMVvpNhj83eBHNyKU1ownEJHDLkMg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "153156118451-hmmktce4drqgnk0hdqrq3c2rppcrnbif.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:153156118451:android:15393bc04bef4541a58dc6",
         "android_client_info": {
           "package_name": "com.example.crunch_fitnes"

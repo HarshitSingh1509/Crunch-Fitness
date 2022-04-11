@@ -6,6 +6,7 @@ import 'package:crunch_fitnes/Screens/others.dart';
 import 'package:crunch_fitnes/Screens/plans.dart';
 import 'package:crunch_fitnes/Screens/profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -18,9 +19,21 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
+Future<void> updatetoken() async {
+  FirebaseAuth auth = FirebaseAuth.instance;
+  String uid = auth.currentUser!.uid;
+  String? token = await FirebaseMessaging.instance.getToken();
+  CollectionReference users = FirebaseFirestore.instance.collection('Users');
+  print("token updated");
+  users.doc(auth.currentUser!.uid).set(
+      {'token': await FirebaseMessaging.instance.getToken()},
+      SetOptions(merge: true));
+}
+
 class _HomePageState extends State<HomePage> {
   @override
   void initState() {
+    updatetoken();
     // TODO: implement initState
     super.initState();
   }

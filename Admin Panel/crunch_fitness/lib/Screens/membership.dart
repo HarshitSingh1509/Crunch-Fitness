@@ -84,7 +84,7 @@ class _MembershipState extends State<Membership> {
               child: SizedBox(
                 height: 200 * heightfactor,
                 child: GridView.builder(
-                    physics: NeverScrollableScrollPhysics(),
+                    // physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
@@ -164,8 +164,17 @@ class _MembershipState extends State<Membership> {
                                   SizedBox(
                                     height: 7 * heightfactor,
                                   ),
-                                  icobbuttonWidget(
-                                      () {},
+                                  icobbuttonWidget(() {
+                                    final collection =
+                                        FirebaseFirestore.instance.collection(
+                                            '/AppData/Topics/maintopics');
+                                    collection
+                                        .doc(alltopicsid[
+                                            index]) // <-- Doc ID to be deleted.
+                                        .delete()
+                                        .then((value) =>
+                                            getalltopics()); // <-- Delete
+                                  },
                                       25 * sizefactor,
                                       Icon(
                                         Icons.delete,
@@ -247,7 +256,7 @@ class _MembershipState extends State<Membership> {
               child: SizedBox(
                 height: 250 * heightfactor,
                 child: GridView.builder(
-                    physics: NeverScrollableScrollPhysics(),
+                    //  physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
@@ -333,8 +342,17 @@ class _MembershipState extends State<Membership> {
                                 SizedBox(
                                   height: 7 * heightfactor,
                                 ),
-                                icobbuttonWidget(
-                                    () {},
+                                icobbuttonWidget(() {
+                                  final collection = FirebaseFirestore.instance
+                                      .collection(
+                                          '/AppData/Topics/Other Activities');
+                                  collection
+                                      .doc(activityid[
+                                          index]) // <-- Doc ID to be deleted.
+                                      .delete()
+                                      .then((value) =>
+                                          loadactivities()); // <-- Delete
+                                },
                                     25 * sizefactor,
                                     Icon(
                                       Icons.delete,
